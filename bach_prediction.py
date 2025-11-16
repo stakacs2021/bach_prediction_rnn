@@ -58,14 +58,14 @@ tf.random.set_seed(42)
 np.random.seed(42)
 
 #debug
-print("Creating training sequences...")
+print("...Creating training sequences...")
 train_set = create_sequences(train_chorales, sequence_length=sequence_length, 
                              batch_size=batch_size)
 valid_set = create_sequences(valid_chorales, sequence_length=sequence_length, 
                             batch_size=batch_size)
 
 #build model
-print("Building model...")
+print("\n...Building Model...")
 model = tf.keras.Sequential([
     tf.keras.layers.Input(shape=(sequence_length, 4)),
     tf.keras.layers.SimpleRNN(128, return_sequences=False),
@@ -83,7 +83,7 @@ model.compile(
 model.summary()
 
 #train
-print("Training model...")
+print("\n...Training Model...")
 model_checkpoint = tf.keras.callbacks.ModelCheckpoint(
     "bach_model_best.keras",
     monitor="val_loss",
@@ -101,10 +101,10 @@ history = model.fit(
 #load best model
 try:
     model = tf.keras.models.load_model("bach_model_best.keras")
-    print("Loaded best model from checkpoint.")
+    print("loaded best model")
 except Exception as e:
-    print(f"Warning: Could not load saved model: {e}")
-    print("Using the model from training instead.")
+    print(f"error saving model{e}")
+    print("training model")
 
 #generate chorale
 def generate_chorale(model, seed_sequence, length=100, temperature=1.0):
@@ -137,7 +137,7 @@ def generate_chorale(model, seed_sequence, length=100, temperature=1.0):
     return generated
 
 #gnerate chorales
-print("\nGenerating chorales...")
+print("\n...Generating Chorales...")
 
 #seed
 seed_chorale = test_chorales[0]
@@ -145,13 +145,13 @@ seed_sequence = seed_chorale[:sequence_length]
 
 #generate multipel 
 for i in range(3):
-    print(f"Generating chorale {i+1}...")
+    print(f"generating chorale {i+1}...")
     generated = generate_chorale(model, seed_sequence, length=200, temperature=1.0)
     
     #save genrated as csv
     output_df = pd.DataFrame(generated, columns=["note0", "note1", "note2", "note3"])
     output_path = f"generated_chorale_{i+1}.csv"
     output_df.to_csv(output_path, index=False)
-    print(f"Saved {output_path}")
+    print(f"saved: {output_path}")
 
 print("\nDone! Generated chorales saved as CSV files.")
